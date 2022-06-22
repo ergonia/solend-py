@@ -55,7 +55,8 @@ def calculate_positions(market_metadata, deposits, borrows, solana_rpc):
         liquidation_threshold += supply_amount_usd * liq_threshold
         deposits_parsed.append({
             "asset": config["asset"],
-            "amount": supply_amount
+            "amount": supply_amount,
+            "amount_usd": supply_amount_usd
         })
 
     for borrow in borrows:
@@ -70,7 +71,8 @@ def calculate_positions(market_metadata, deposits, borrows, solana_rpc):
         user_total_borrow += borrow_amount_usd
         borrows_parsed.append({
             "asset": config["asset"],
-            "amount": borrow_amount
+            "amount": borrow_amount,
+            "amount_usd": borrow_amount_usd
         })
         
     return {
