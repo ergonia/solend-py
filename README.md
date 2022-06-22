@@ -1,5 +1,5 @@
-# solend-py
-A python library for interacting with solend
+# Solend Python Explorer
+A python library for interacting with solend. In current state this library provides the ability to parse the position of a wallet.
 
 Usage
 
@@ -9,14 +9,28 @@ fetch_obligation_by_wallet("3oSE9CtGMQeAdtkm2U3ENhEpkFMfvrckJMA8QwVsuRbE")
 ```
 Output
 ```
-{'deposits': [{'asset': 'SOL', 'amount': 4501990.960223003}],
- 'borrows': [{'asset': 'USDT', 'amount': 1550348.3728843194},
-  {'asset': 'USDC', 'amount': 82820648.67344044}],
- 'liquidation_threshold': 13340776430.450378,
- 'user_total_deposit': 156950310.94647503,
- 'user_total_borrow': 84369209.06055328,
- 'borrow_limit': 11771273320.985626,
- 'borrow_utilization': 0.007167381706288417,
- 'net_account_value': 72581101.88592175
- }
+{
+  "deposits": [
+    {
+      "asset": "SOL",
+      "amount": 4000016.620523712
+    }
+  ],
+  "borrows": [
+    {
+      "asset": "USDT",
+      "amount": 0.49660628370575016
+    },
+    {
+      "asset": "USDC",
+      "amount": 72833116.89264491
+    }
+  ],
+  "liquidation_threshold": 12022575880.969307,
+  "user_total_deposit": 141442069.1878742,
+  "user_total_borrow": 72833135.5969685,
+  "borrow_limit": 106081551.89090565,
+  "borrow_utilization": 0.6865768297947805,
+  "net_account_value": 68608933.5909057
+}
 ```
