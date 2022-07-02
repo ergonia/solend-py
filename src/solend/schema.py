@@ -34,7 +34,7 @@ RESERVE_SCHEMA = CStruct(
     "feeReceiver" / BorshPubkey
 )
 
-USER_GENERAL_SCHEMA = CStruct(
+OVERVIEW_SCHEMA = CStruct(
     "version" / U8,
     "slot" / U64,
     "stale" / U8,
@@ -49,14 +49,14 @@ USER_GENERAL_SCHEMA = CStruct(
     "borrowsLen" / U8
 )
 
-USER_DEPOSIT_SCHEMA =  CStruct(
+DEPOSIT_SCHEMA =  CStruct(
     "depositReserve" / BorshPubkey,
     "depositedAmount" / U64,
     "marketValue" / U128,
     "padding" / Padding(32)
 )
 
-USER_BORROW_SCHEMA = CStruct(
+BORROW_SCHEMA = CStruct(
     "borrowReserve" / BorshPubkey,
     "cumulativeBorrowRateWads" / U128,
     "borrowAmountWads" / U128,
