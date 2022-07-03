@@ -1,5 +1,5 @@
 from solana.utils.helpers import decode_byte_string
-from solana.rpc.api import Client
+from solana.rpc.api import Client, MemcmpOpt
 
 
 def query_solana_account(account, solana_rpc="https://api.mainnet-beta.solana.com"):
