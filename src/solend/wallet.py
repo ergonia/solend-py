@@ -26,7 +26,7 @@ def solend_wallet_account_state(
             return data
 
 
-def parse_deposit(deposit, reserve):
+def compute_deposit_quantity(deposit, reserve):
     total_borrow_wads = reserve.borrowedAmountWads
     total_supply_wads = reserve.availableAmount * WAD
     total_deposit_wads = total_borrow_wads + total_supply_wads
@@ -36,7 +36,7 @@ def parse_deposit(deposit, reserve):
     return amount
 
 
-def parse_borrow(borrow, reserve):
+def compute_borrow_quantity(borrow, reserve):
     amount = borrow.borrowAmountWads * \
         reserve.cumulativeBorrowRateWads / borrow.cumulativeBorrowRateWads / WAD
     amount = amount / 10**reserve.liquidityMintDecimals
@@ -71,7 +71,7 @@ def calculate_positions(
 
         ltv = reserve.loanToValueRatio / 100
         liq_threshold = reserve.liquidationThreshold / 100
-        supply_amount = parse_deposit(deposit, reserve)
+        supply_amount = compute_deposit_quantity(deposit, reserve)
         price = load_price(reserve)
         
         supply_amount_usd = supply_amount * price
@@ -86,7 +86,7 @@ def calculate_positions(
 
     for borrow in borrows:
         reserve, asset = load_reserve(borrow.borrowReserve, market_metadata, solana_rpc)
-        borrow_amount = parse_borrow(borrow, reserve)
+        borrow_amount = compute_borrow_quantity(borrow, reserve)
         price = load_price(reserve)
         
         borrow_amount_usd = borrow_amount * price
