@@ -63,3 +63,8 @@ BORROW_SCHEMA = CStruct(
     "marketValue" / U128,
     "padding" / Padding(32)
 )
+
+LIQUIDATION_TRANSACTION_SCHEMA = CStruct(
+    "instruction" / U8,
+    "liquidityAmount" / U64
+)
