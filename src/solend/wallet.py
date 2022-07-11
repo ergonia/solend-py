@@ -1,7 +1,6 @@
 from solend.api import solend_market_config
 from solend.solana_rpc import query_solana_account
-from solend.reserve import load_reserve_config
-from solend.schema import OVERVIEW_SCHEMA, DEPOSIT_SCHEMA, BORROW_SCHEMA
+from solend.schema import ACCOUNT_SCHEMA, RESERVE_SCHEMA
 from solend.constant import WAD
 from solana.publickey import PublicKey
 import numpy as np
@@ -12,7 +11,7 @@ def solend_wallet_account_state(
     market="main", 
     deployment="production",
     solend_api="https://api.solend.fi",
-    solana_rpc="https://api.mainnet-beta.solana.com",
+    solana_http_rpc="https://api.mainnet-beta.solana.com",
 ):
         config = solend_market_config(deployment, solend_api)
         market_metadata = next((m for m in config["markets"] if m["name"] == market))
@@ -22,7 +21,7 @@ def solend_wallet_account_state(
             account_address = PublicKey.create_with_seed(PublicKey(wallet_address), 
                                                          market_address[0:32], 
                                                          PublicKey(program_id))
-            data = query_solana_account(account_address, solana_rpc)
+            data = query_solana_account(account_address, layout=ACCOUNT_SCHEMA, solana_http_rpc=solana_http_rpc)
             return data
 
 
@@ -49,14 +48,13 @@ def load_price(reserve):
 
 def load_reserve(address, market_metadata, solana_rpc):
     config = next((m for m in market_metadata["reserves"] if m["address"] == str(address)))
-    reserve = load_reserve_config(config["address"], solana_rpc)
+    reserve = query_solana_account(config["address"], layout=RESERVE_SCHEMA, solana_http_rpc=solana_rpc)
     return reserve, config["asset"]
 
 
 def calculate_positions(
-    market_metadata, 
-    deposits, 
-    borrows, 
+    account_payload,
+    market_metadata,
     solana_rpc
 ):
     user_total_deposit = 0
@@ -66,7 +64,7 @@ def calculate_positions(
     deposits_parsed = []
     borrows_parsed = []
     
-    for deposit in deposits:
+    for deposit in account_payload.deposits:
         reserve, asset = load_reserve(deposit.depositReserve, market_metadata, solana_rpc)
 
         ltv = reserve.loanToValueRatio / 100
@@ -84,7 +82,7 @@ def calculate_positions(
             "amount_usd": supply_amount_usd
         })
 
-    for borrow in borrows:
+    for borrow in account_payload.borrows:
         reserve, asset = load_reserve(borrow.borrowReserve, market_metadata, solana_rpc)
         borrow_amount = compute_borrow_quantity(borrow, reserve)
         price = load_price(reserve)
@@ -118,29 +116,9 @@ def fetch_obligation_by_wallet(
 ):
     config = solend_market_config(deployment, solend_api)
     market_metadata = next((m for m in config["markets"] if m["name"] == market))
-    user_account_bytes = solend_wallet_account_state(address, market, deployment, solend_api, solana_rpc)
-    user_general_payload = OVERVIEW_SCHEMA.parse(user_account_bytes[0:OVERVIEW_SCHEMA.sizeof()])
-
-    deposit_borrow_data = user_account_bytes[OVERVIEW_SCHEMA.sizeof():]
-    deposits = []
-    borrows = []
-    deposits_len = user_general_payload.depositsLen
-    borrows_len = user_general_payload.borrowsLen
-    deposit_size = DEPOSIT_SCHEMA.sizeof()
-    borrow_size = BORROW_SCHEMA.sizeof()
-
-    for i in range(deposits_len):
-        deposit_payload = DEPOSIT_SCHEMA.parse(deposit_borrow_data[deposit_size*i:deposit_size*(i+1)])
-        deposits.append(deposit_payload)
-
-    for i in range(borrows_len):
-        borrow_unpacked = BORROW_SCHEMA.parse(
-            deposit_borrow_data[deposits_len*deposit_size+i*borrow_size:deposits_len*deposit_size+(i+1)*borrow_size]
-        )
-        borrows.append(borrow_unpacked)
-
+    account_payload = solend_wallet_account_state(address, market, deployment, solend_api, solana_rpc)
     
-    obligation = calculate_positions(market_metadata, deposits, borrows, solana_rpc)
+    obligation = calculate_positions(account_payload, market_metadata, solana_rpc)
     return obligation
 
 

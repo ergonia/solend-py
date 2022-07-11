@@ -34,21 +34,6 @@ RESERVE_SCHEMA = CStruct(
     "feeReceiver" / BorshPubkey
 )
 
-OVERVIEW_SCHEMA = CStruct(
-    "version" / U8,
-    "slot" / U64,
-    "stale" / U8,
-    "lendingMarket"/ BorshPubkey,
-    "owner" / BorshPubkey,
-    "depositedValue" / U128,
-    "borrowedValue" / U128,
-    "allowedBorrowValue" / U128,
-    "unhealthyBorrowValue" / U128,
-    "padding" / Padding(64),
-    "depositsLen" / U8,
-    "borrowsLen" / U8
-)
-
 DEPOSIT_SCHEMA =  CStruct(
     "depositReserve" / BorshPubkey,
     "depositedAmount" / U64,
@@ -62,6 +47,23 @@ BORROW_SCHEMA = CStruct(
     "borrowAmountWads" / U128,
     "marketValue" / U128,
     "padding" / Padding(32)
+)
+
+ACCOUNT_SCHEMA = CStruct(
+    "version" / U8,
+    "slot" / U64,
+    "stale" / U8,
+    "lendingMarket"/ BorshPubkey,
+    "owner" / BorshPubkey,
+    "depositedValue" / U128,
+    "borrowedValue" / U128,
+    "allowedBorrowValue" / U128,
+    "unhealthyBorrowValue" / U128,
+    "padding" / Padding(64),
+    "depositsLen" / U8,
+    "borrowsLen" / U8,
+    "deposits" / DEPOSIT_SCHEMA[lambda this: this.depositsLen],
+    "borrows" / BORROW_SCHEMA[lambda this: this.borrowsLen]
 )
 
 LIQUIDATION_TRANSACTION_SCHEMA = CStruct(
