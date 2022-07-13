@@ -66,7 +66,11 @@ ACCOUNT_SCHEMA = CStruct(
     "borrows" / BORROW_SCHEMA[lambda this: this.borrowsLen]
 )
 
-LIQUIDATION_TRANSACTION_SCHEMA = CStruct(
+INSTRUCTION_SCHEMA = CStruct(
+    "instruction" / U8
+)
+
+LIQUIDATION_INSTRUCTION_SCHEMA = CStruct(
     "instruction" / U8,
     "liquidityAmount" / U64
 )
