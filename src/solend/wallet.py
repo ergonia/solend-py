@@ -102,7 +102,7 @@ def calculate_positions(
         "user_total_deposit": user_total_deposit,
         "user_total_borrow": user_total_borrow,
         "borrow_limit": borrow_limit,
-        "borrow_utilization": user_total_borrow / borrow_limit,
+        "borrow_utilization": user_total_borrow / borrow_limit if borrow_limit else np.nan,
         "net_account_value": user_total_deposit - user_total_borrow
     }
 
